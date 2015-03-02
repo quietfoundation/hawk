@@ -23,14 +23,19 @@ final class HawkEncoder implements Encoder {
 
     private final Encryption encryption;
     private final Parser parser;
+    private final Logger logger;
 
-    public HawkEncoder(Encryption encryption, Parser parser) {
+    public HawkEncoder(Logger logger, Encryption encryption, Parser parser) {
+        if (logger == null) {
+            throw new NullPointerException("Logger may not be null");
+        }
         if (encryption == null) {
             throw new NullPointerException("Encryption may not be null");
         }
         if (parser == null) {
             throw new NullPointerException("Parser may not be null");
         }
+        this.logger = logger;
         this.encryption = encryption;
         this.parser = parser;
     }
@@ -73,7 +78,7 @@ final class HawkEncoder implements Encoder {
         if (value == null) {
             return null;
         }
-        DataInfo info = DataUtil.getDataInfo(value);
+        DataInfo info = DataUtil.getDataInfo(logger, value);
         boolean isList = info.isList();
 
         byte[] bytes = encryption.decrypt(info.getCipherText());
@@ -127,7 +132,7 @@ final class HawkEncoder implements Encoder {
             oos.close();
             result = baos.toByteArray();
         } catch (IOException e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
         return result;
     }
@@ -145,7 +150,7 @@ final class HawkEncoder implements Encoder {
         try {
             inputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));
         } catch (IOException e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
 
         if (inputStream == null) {
@@ -156,7 +161,7 @@ final class HawkEncoder implements Encoder {
         try {
             result = (T) inputStream.readObject();
         } catch (ClassNotFoundException | IOException e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
         return result;
     }

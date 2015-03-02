@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Provides a secure simple key-value store
+ *
  * @author Orhan Obut
  */
 public final class Hawk {
@@ -19,61 +21,29 @@ public final class Hawk {
     //never ever change this value since it will break backward compatibility in terms of keeping previous data
     private static final String TAG_CRYPTO = "324909sdfsd98098";
 
-    private static Encoder encoder;
-    private static Storage storage;
-    private static Encryption encryption;
-    private static LogLevel logLevel;
+    private Encoder encoder;
+    private Storage storage;
+    private Encryption encryption;
+    private LogLevel logLevel;
+    private Logger logger;
 
-    private Hawk() {
-        // no instance
+    /**
+     * Gets a new instance of Hawk
+     */
+    public Hawk(Context context, String password) {
+        this(context, password, LogLevel.NONE);
     }
 
     /**
-     * This method must be called in order to initiate the hawk
-     *
-     * @param context  is used to instantiate context based objects. ApplicationContext will be used
-     * @param password is used for key generation
+     * Get a new instance of Hawk.
      */
-    public static void init(Context context, String password) {
-        init(context, password, LogLevel.NONE);
-    }
-
-    /**
-     * This method must be called in order to initiate the hawk
-     *
-     * @param context  is used to instantiate context based objects. ApplicationContext will be used
-     * @param password is used for key generation
-     * @param salt     is used for salting encryption
-     */
-    public static void init(Context context, String password, String salt) {
-        init(context, password, salt, LogLevel.NONE);
-    }
-
-    /**
-     * This method must be called in order to initiate the hawk
-     *
-     * @param context  is used to instantiate context based objects. ApplicationContext will be used
-     * @param password is used for key generation
-     * @param logLevel is used for logging
-     */
-    public static void init(Context context, String password, LogLevel logLevel) {
-        init(context, password, null, logLevel);
-    }
-
-    /**
-     * This method must be called in order to initiate the hawk
-     *
-     * @param context  is used to instantiate context based objects. ApplicationContext will be used
-     * @param password is used for key generation
-     * @param logLevel is used for logging
-     * @param salt     is used for salting encryption
-     */
-    public static void init(Context context, String password, String salt, LogLevel logLevel) {
+    public Hawk(Context context, String password, LogLevel logLevel) {
         Context appContext = context.getApplicationContext();
-        Hawk.logLevel = logLevel;
-        Hawk.storage = new SharedPreferencesStorage(appContext, TAG);
-        Hawk.encryption = new AesEncryption(new SharedPreferencesStorage(appContext, TAG_CRYPTO), password, salt);
-        Hawk.encoder = new HawkEncoder(encryption, new GsonParser(new Gson()));
+        this.logger = new Logger(logLevel);
+        this.storage = new SharedPreferencesStorage(appContext, TAG);
+        this.encryption = new AesEncryption(logger, new SharedPreferencesStorage(appContext, TAG_CRYPTO), password);
+        this.encoder = new HawkEncoder(logger, encryption, new GsonParser(new Gson()));
+        this.logLevel = logLevel;
     }
 
     /**
@@ -83,7 +53,7 @@ public final class Hawk {
      * @param value is the data that is gonna be saved. Value can be object, list type, primitives
      * @return true if put is successful
      */
-    public static <T> boolean put(String key, T value) {
+    public <T> boolean put(String key, T value) {
         if (key == null) {
             throw new NullPointerException("Key cannot be null");
         }
@@ -103,7 +73,7 @@ public final class Hawk {
      * @param list is the data that will be saved
      * @return true if put is successful
      */
-    public static <T> boolean put(String key, List<T> list) {
+    public <T> boolean put(String key, List<T> list) {
         if (key == null) {
             throw new NullPointerException("Key cannot be null");
         }
@@ -122,7 +92,7 @@ public final class Hawk {
      * @param value is the given value to encode
      * @return full text as string
      */
-    private static <T> String encode(T value) {
+    private <T> String encode(T value) {
         if (value == null) {
             throw new NullPointerException("Value cannot be null");
         }
@@ -139,7 +109,7 @@ public final class Hawk {
      * @param list is the given list to encode
      * @return full text as string
      */
-    private static <T> String encode(List<T> list) {
+    private <T> String encode(List<T> list) {
         if (list == null) {
             throw new NullPointerException("List<T> cannot be null");
         }
@@ -158,7 +128,7 @@ public final class Hawk {
      * @param key is used to get the saved data
      * @return the saved object
      */
-    public static <T> T get(String key) {
+    public <T> T get(String key) {
         if (key == null) {
             throw new NullPointerException("Key cannot be null");
         }
@@ -166,7 +136,7 @@ public final class Hawk {
         try {
             return encoder.decode(fullText);
         } catch (Exception e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
         return null;
     }
@@ -178,7 +148,7 @@ public final class Hawk {
      * @param defaultValue will be return if the response is null
      * @return the saved object
      */
-    public static <T> T get(String key, T defaultValue) {
+    public <T> T get(String key, T defaultValue) {
         T t = get(key);
         if (t == null) {
             return defaultValue;
@@ -191,7 +161,7 @@ public final class Hawk {
      *
      * @return a simple chaining object
      */
-    public static Chain chain() {
+    public Chain chain() {
         return new Chain();
     }
 
@@ -201,7 +171,7 @@ public final class Hawk {
      * @param capacity the amount of put invocations you're about to do
      * @return a simple chaining object
      */
-    public static Chain chain(int capacity) {
+    public Chain chain(int capacity) {
         return new Chain(capacity);
     }
 
@@ -210,7 +180,7 @@ public final class Hawk {
      *
      * @return the size
      */
-    public static int count() {
+    public int count() {
         return storage.count();
     }
 
@@ -220,7 +190,7 @@ public final class Hawk {
      *
      * @return true if clear is successful
      */
-    public static boolean clear() {
+    public boolean clear() {
         return storage.clear();
     }
 
@@ -230,7 +200,7 @@ public final class Hawk {
      * @param key is used for removing related data from storage
      * @return true if remove is successful
      */
-    public static boolean remove(String key) {
+    public boolean remove(String key) {
         return storage.remove(key);
     }
 
@@ -240,7 +210,7 @@ public final class Hawk {
      * @param keys are used for removing related data from storage
      * @return true if all removals are successful
      */
-    public static boolean remove(String... keys) {
+    public boolean remove(String... keys) {
         return storage.remove(keys);
     }
 
@@ -250,7 +220,7 @@ public final class Hawk {
      * @param key is the key to check
      * @return true if it exists in the storage
      */
-    public static boolean contains(String key) {
+    public boolean contains(String key) {
         return storage.contains(key);
     }
 
@@ -259,22 +229,22 @@ public final class Hawk {
      *
      * @return true if reset is successful
      */
-    public static boolean resetCrypto() {
+    public boolean resetCrypto() {
         return encryption.reset();
     }
 
-    public static LogLevel getLogLevel() {
+    public LogLevel getLogLevel() {
         return logLevel;
     }
 
     /**
      * Provides the ability to chain put invocations:
-     * <code>Hawk.chain().put("foo", 0).put("bar", false).commit()</code>
+     * <code>hawk.chain().put("foo", 0).put("bar", false).commit()</code>
      * <p/>
      * <code>commit()</code> writes the chain values to persistent storage. Omitting it will
      * result in all chained data being lost.
      */
-    public static final class Chain {
+    public final class Chain {
 
         private final List<Pair<String, ?>> items;
 
@@ -298,7 +268,7 @@ public final class Hawk {
             }
             String encodedText = encode(value);
             if (encodedText == null) {
-                Log.d(TAG, "Key : " + key + " is not added, encryption failed");
+                logger.d("Key : " + key + " is not added, encryption failed");
                 return this;
             }
             items.add(new Pair<>(key, encodedText));
@@ -317,7 +287,7 @@ public final class Hawk {
             }
             String encodedText = encode(list);
             if (encodedText == null) {
-                Log.d(TAG, "Key : " + key + " is not added, encryption failed");
+                logger.d("Key : " + key + " is not added, encryption failed");
                 return this;
             }
             items.add(new Pair<>(key, encodedText));

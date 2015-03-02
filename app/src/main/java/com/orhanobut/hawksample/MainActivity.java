@@ -21,13 +21,14 @@ public class MainActivity extends Activity {
 
     private SharedPreferences.Editor editor;
     private SharedPreferences prefs;
+    private Hawk hawk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Hawk.init(this, "asdfasdfds", LogLevel.FULL);
+        hawk = new Hawk(this, "asdfasdfds", LogLevel.FULL);
 
         prefs = getSharedPreferences("BENCHARMK", MODE_PRIVATE);
         editor = prefs.edit();
@@ -59,9 +60,9 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
+        hawk.clear();
         start = System.nanoTime();
-        Hawk.put(KEY, value);
+        hawk.put(KEY, value);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -78,9 +79,9 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
+        hawk.clear();
         start = System.nanoTime();
-        Hawk.put(KEY, value);
+        hawk.put(KEY, value);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -99,9 +100,9 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
+        hawk.clear();
         start = System.nanoTime();
-        Hawk.put(KEY, foo);
+        hawk.put(KEY, foo);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -123,9 +124,9 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
+        hawk.clear();
         start = System.nanoTime();
-        Hawk.put(KEY, list);
+        hawk.put(KEY, list);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -147,9 +148,9 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
+        hawk.clear();
         start = System.nanoTime();
-        Hawk.put(KEY, list);
+        hawk.put(KEY, list);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -168,10 +169,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, value);
+        hawk.clear();
+        hawk.put(KEY, value);
         start = System.nanoTime();
-        Hawk.get(KEY);
+        hawk.get(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -190,10 +191,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, value);
+        hawk.clear();
+        hawk.put(KEY, value);
         start = System.nanoTime();
-        Hawk.get(KEY);
+        hawk.get(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -219,10 +220,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, list);
+        hawk.clear();
+        hawk.put(KEY, list);
         start = System.nanoTime();
-        Hawk.get(KEY);
+        hawk.get(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -248,10 +249,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, list);
+        hawk.clear();
+        hawk.put(KEY, list);
         start = System.nanoTime();
-        Hawk.get(KEY);
+        hawk.get(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -273,10 +274,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, foo);
+        hawk.clear();
+        hawk.put(KEY, foo);
         start = System.nanoTime();
-        Hawk.get(KEY);
+        hawk.get(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 
@@ -295,10 +296,10 @@ public class MainActivity extends Activity {
         long end = System.nanoTime();
         double resultPref = getTime(start, end);
 
-        Hawk.clear();
-        Hawk.put(KEY, value);
+        hawk.clear();
+        hawk.put(KEY, value);
         start = System.nanoTime();
-        Hawk.remove(KEY);
+        hawk.remove(KEY);
         end = System.nanoTime();
         double resultHawk = getTime(start, end);
 

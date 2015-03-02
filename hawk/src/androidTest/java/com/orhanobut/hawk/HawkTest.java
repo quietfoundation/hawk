@@ -12,6 +12,7 @@ import java.util.List;
 public class HawkTest extends InstrumentationTestCase {
 
     Context context;
+    Hawk hawk;
 
     @Override
     protected void setUp() throws Exception {
@@ -20,9 +21,9 @@ public class HawkTest extends InstrumentationTestCase {
                 "dexmaker.dexcache",
                 getInstrumentation().getTargetContext().getCacheDir().getPath());
         context = getInstrumentation().getContext();
-        Hawk.init(context, "testPassword");
-        Hawk.clear();
-        Hawk.resetCrypto();
+        hawk = new Hawk(context, "testPassword");
+        hawk.clear();
+        hawk.resetCrypto();
     }
 
     @Override
@@ -32,160 +33,160 @@ public class HawkTest extends InstrumentationTestCase {
     }
 
     public void testBoolean() {
-        Hawk.put("tag", true);
-        assertEquals(true, Hawk.get("tag"));
+        hawk.put("tag", true);
+        assertEquals(true, hawk.get("tag"));
     }
 
     public void testBooleanDefault() {
-        assertEquals(Boolean.FALSE, Hawk.get("tag", false));
+        assertEquals(Boolean.FALSE, hawk.get("tag", false));
     }
 
     public void testBooleanNotDefault() {
-        Hawk.put("tag", true);
-        assertNotSame(true, Hawk.get("tag", false));
+        hawk.put("tag", true);
+        assertNotSame(true, hawk.get("tag", false));
     }
 
     public void testChar() {
         char expected = 'a';
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testCharDefault() {
         char expected = 'a';
-        assertEquals(Character.valueOf(expected), Hawk.get("tag", expected));
+        assertEquals(Character.valueOf(expected), hawk.get("tag", expected));
     }
 
     public void testCharNotDefault() {
         char expected = 'a';
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 'b'));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 'b'));
     }
 
     public void testByte() {
         byte expected = 0;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testByteDefault() {
         byte expected = 0;
-        assertEquals(Byte.valueOf(expected), Hawk.get("tag", expected));
+        assertEquals(Byte.valueOf(expected), hawk.get("tag", expected));
     }
 
     public void testByteNotDefault() {
         byte expected = 0;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 1));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 1));
     }
 
     public void testShort() {
         short expected = 0;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testShortDefault() {
         short expected = 0;
-        assertEquals(Short.valueOf(expected), Hawk.get("tag", expected));
+        assertEquals(Short.valueOf(expected), hawk.get("tag", expected));
     }
 
     public void testShortNotDefault() {
         short expected = 0;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 1));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 1));
     }
 
     public void testInt() {
         int expected = 0;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testIntDefault() {
         int expected = 0;
-        assertEquals(Integer.valueOf(expected), Hawk.get("tag", expected));
+        assertEquals(Integer.valueOf(expected), hawk.get("tag", expected));
     }
 
     public void testIntNotDefault() {
         int expected = 0;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 1));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 1));
     }
 
     public void testLong() {
         long expected = 100L;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testLongDefault() {
         long expected = 100L;
-        assertEquals(Long.valueOf(expected), Hawk.get("tag", expected));
+        assertEquals(Long.valueOf(expected), hawk.get("tag", expected));
     }
 
     public void testLongNotDefault() {
         long expected = 100L;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 99L));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 99L));
     }
 
     public void testFloat() {
         float expected = 0.1f;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testFloatDefault() {
         float expected = 0.1f;
-        assertEquals(expected, Hawk.get("tag", expected));
+        assertEquals(expected, hawk.get("tag", expected));
     }
 
     public void testFloatNotDefault() {
         float expected = 0.1f;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 0.9f));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 0.9f));
     }
 
     public void testDouble() {
         double expected = 11;
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testDoubleDefault() {
         double expected = 11;
-        assertEquals(expected, Hawk.get("tag", expected));
+        assertEquals(expected, hawk.get("tag", expected));
     }
 
     public void testDoubleNotDefault() {
         double expected = 11;
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", 99));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", 99));
     }
 
     public void testString() {
         String expected = "test";
-        Hawk.put("tag", expected);
-        assertEquals(expected, Hawk.get("tag"));
+        hawk.put("tag", expected);
+        assertEquals(expected, hawk.get("tag"));
     }
 
     public void testStringDefault() {
         String expected = "test";
-        assertEquals(expected, Hawk.get("tag", expected));
+        assertEquals(expected, hawk.get("tag", expected));
     }
 
     public void testStringNotDefault() {
         String expected = "test";
-        Hawk.put("tag", expected);
-        assertNotSame(expected, Hawk.get("tag", "default"));
+        hawk.put("tag", expected);
+        assertNotSame(expected, hawk.get("tag", "default"));
     }
 
     public void testSerializableObject() {
         FooSerializable foo = new FooSerializable();
 
-        Hawk.put("tag", foo);
-        FooSerializable foo1 = Hawk.get("tag");
+        hawk.put("tag", foo);
+        FooSerializable foo1 = hawk.get("tag");
 
         assertNotNull(foo1);
     }
@@ -193,7 +194,7 @@ public class HawkTest extends InstrumentationTestCase {
     public void testSerializableObjectDefault() {
         FooSerializable foo = new FooSerializable();
 
-        FooSerializable foo1 = Hawk.get("tag", foo);
+        FooSerializable foo1 = hawk.get("tag", foo);
 
         assertNotNull(foo1);
     }
@@ -201,8 +202,8 @@ public class HawkTest extends InstrumentationTestCase {
     public void testNotSerializableObject() {
         FooNotSerializable foo = new FooNotSerializable();
 
-        Hawk.put("tag", foo);
-        FooNotSerializable foo1 = Hawk.get("tag");
+        hawk.put("tag", foo);
+        FooNotSerializable foo1 = hawk.get("tag");
 
         assertNotNull(foo1);
     }
@@ -210,15 +211,15 @@ public class HawkTest extends InstrumentationTestCase {
     public void testNotSerializableObjectDefault() {
         FooNotSerializable foo = new FooNotSerializable();
 
-        FooNotSerializable foo1 = Hawk.get("tag", foo);
+        FooNotSerializable foo1 = hawk.get("tag", foo);
 
         assertNotNull(foo1);
     }
 
     public void testParcelableObject() {
         FooParcelable foo = new FooParcelable();
-        Hawk.put("tag", foo);
-        FooParcelable fooParcelable = Hawk.get("tag");
+        hawk.put("tag", foo);
+        FooParcelable fooParcelable = hawk.get("tag");
 
         assertNotNull(fooParcelable);
     }
@@ -226,7 +227,7 @@ public class HawkTest extends InstrumentationTestCase {
     public void testParcelableObjectDefault() {
         FooParcelable foo = new FooParcelable();
 
-        FooParcelable fooParcelable = Hawk.get("tag", foo);
+        FooParcelable fooParcelable = hawk.get("tag", foo);
 
         assertNotNull(fooParcelable);
     }
@@ -236,9 +237,9 @@ public class HawkTest extends InstrumentationTestCase {
         list.add("foo");
         list.add("foo");
 
-        Hawk.put("tag", list);
+        hawk.put("tag", list);
 
-        List<String> list1 = Hawk.get("tag");
+        List<String> list1 = hawk.get("tag");
 
         assertNotNull(list1);
     }
@@ -248,7 +249,7 @@ public class HawkTest extends InstrumentationTestCase {
         list.add("foo");
         list.add("foo");
 
-        List<String> list1 = Hawk.get("tag", list);
+        List<String> list1 = hawk.get("tag", list);
 
         assertNotNull(list1);
     }
@@ -258,9 +259,9 @@ public class HawkTest extends InstrumentationTestCase {
         list.add(new FooParcelable());
         list.add(new FooParcelable());
 
-        Hawk.put("tag", list);
+        hawk.put("tag", list);
 
-        List<FooParcelable> list1 = Hawk.get("tag");
+        List<FooParcelable> list1 = hawk.get("tag");
 
         assertNotNull(list1);
     }
@@ -270,7 +271,7 @@ public class HawkTest extends InstrumentationTestCase {
         list.add(new FooParcelable());
         list.add(new FooParcelable());
 
-        List<FooParcelable> list1 = Hawk.get("tag", list);
+        List<FooParcelable> list1 = hawk.get("tag", list);
 
         assertNotNull(list1);
     }
@@ -278,7 +279,7 @@ public class HawkTest extends InstrumentationTestCase {
     public void testEmptyList() {
         try {
             List<FooParcelable> list = new ArrayList<>();
-            Hawk.put("tag", list);
+            hawk.put("tag", list);
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -287,7 +288,7 @@ public class HawkTest extends InstrumentationTestCase {
 
     public void testNullKeyPut() {
         try {
-            Hawk.put(null, "test");
+            hawk.put(null, "test");
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -296,7 +297,7 @@ public class HawkTest extends InstrumentationTestCase {
 
     public void testNullKeyGet() {
         try {
-            Hawk.get(null);
+            hawk.get(null);
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -305,7 +306,7 @@ public class HawkTest extends InstrumentationTestCase {
 
     public void testNullKeyPutList() {
         try {
-            Hawk.put(null, new ArrayList<String>());
+            hawk.put(null, new ArrayList<String>());
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -314,7 +315,7 @@ public class HawkTest extends InstrumentationTestCase {
 
     public void testNullValuePut() {
         try {
-            Hawk.put("tag", null);
+            hawk.put("tag", null);
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -323,77 +324,77 @@ public class HawkTest extends InstrumentationTestCase {
 
     public void testCount() {
         String value = "test";
-        Hawk.put("tag", value);
-        Hawk.put("tag1", value);
-        Hawk.put("tag2", value);
-        Hawk.put("tag3", value);
-        Hawk.put("tag4", value);
+        hawk.put("tag", value);
+        hawk.put("tag1", value);
+        hawk.put("tag2", value);
+        hawk.put("tag3", value);
+        hawk.put("tag4", value);
 
         int expected = 5;
-        assertEquals(expected, Hawk.count());
+        assertEquals(expected, hawk.count());
     }
 
     public void testClear() {
         String value = "test";
-        Hawk.put("tag", value);
-        Hawk.put("tag1", value);
-        Hawk.put("tag2", value);
+        hawk.put("tag", value);
+        hawk.put("tag1", value);
+        hawk.put("tag2", value);
 
-        Hawk.clear();
+        hawk.clear();
         int expected = 0;
 
-        assertEquals(expected, Hawk.count());
+        assertEquals(expected, hawk.count());
     }
 
     public void testRemove() {
         String value = "test";
-        Hawk.put("tag", value);
-        Hawk.put("tag1", value);
-        Hawk.put("tag2", value);
+        hawk.put("tag", value);
+        hawk.put("tag1", value);
+        hawk.put("tag2", value);
 
-        Hawk.remove("tag");
+        hawk.remove("tag");
 
-        String result = Hawk.get("tag");
+        String result = hawk.get("tag");
 
         assertNull(result);
-        assertEquals(2, Hawk.count());
+        assertEquals(2, hawk.count());
     }
 
     public void testBulkRemoval() {
-        Hawk.put("tag", "test");
-        Hawk.put("tag1", 1);
-        Hawk.put("tag2", Boolean.FALSE);
+        hawk.put("tag", "test");
+        hawk.put("tag1", 1);
+        hawk.put("tag2", Boolean.FALSE);
 
-        Hawk.remove("tag", "tag1");
+        hawk.remove("tag", "tag1");
 
-        String result = Hawk.get("tag");
+        String result = hawk.get("tag");
 
         assertNull(result);
-        assertEquals(1, Hawk.count());
+        assertEquals(1, hawk.count());
     }
 
     public void testContains() {
         String value = "test";
         String key = "tag";
-        Hawk.put(key, value);
+        hawk.put(key, value);
 
-        assertTrue(Hawk.contains(key));
+        assertTrue(hawk.contains(key));
 
-        Hawk.remove(key);
+        hawk.remove(key);
 
-        assertFalse(Hawk.contains(key));
+        assertFalse(hawk.contains(key));
     }
 
     public void testChain() {
-        Hawk.chain()
+        hawk.chain()
                 .put("tag", 1)
                 .put("tag1", "yes")
                 .put("tag2", Boolean.FALSE)
                 .commit();
 
-        assertEquals(1, Hawk.get("tag"));
-        assertEquals("yes", Hawk.get("tag1"));
-        assertEquals(false, Hawk.get("tag2"));
+        assertEquals(1, hawk.get("tag"));
+        assertEquals("yes", hawk.get("tag1"));
+        assertEquals(false, hawk.get("tag2"));
     }
 
     public void testChainWithLists() {
@@ -402,18 +403,18 @@ public class HawkTest extends InstrumentationTestCase {
         items.add("snd");
         items.add("trd");
 
-        Hawk.chain()
+        hawk.chain()
                 .put("tag", 1)
                 .put("tag1", "yes")
                 .put("tag2", Boolean.FALSE)
                 .put("lst", items)
                 .commit();
 
-        assertEquals(1, Hawk.get("tag"));
-        assertEquals("yes", Hawk.get("tag1"));
-        assertEquals(false, Hawk.get("tag2"));
+        assertEquals(1, hawk.get("tag"));
+        assertEquals("yes", hawk.get("tag1"));
+        assertEquals(false, hawk.get("tag2"));
 
-        List<String> stored = Hawk.get("lst");
+        List<String> stored = hawk.get("lst");
         assertNotNull(stored);
         assertFalse(stored.isEmpty());
 

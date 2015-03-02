@@ -7,37 +7,41 @@ import android.util.Log;
  */
 @SuppressWarnings("unused")
 final class Logger {
+    private LogLevel logLevel;
+
+    Logger(LogLevel logLevel) {
+        this.logLevel = logLevel;
+    }
 
     private static final int CHUNK_SIZE = 4000;
 
     private static final String TAG = "Hawk";
 
-    static void d(String message) {
+    void d(String message) {
         log(Log.DEBUG, message);
     }
 
-    static void e(String message) {
+    void e(String message) {
         log(Log.ERROR, message);
     }
 
-    static void w(String message) {
+    void w(String message) {
         log(Log.WARN, message);
     }
 
-    static void i(String message) {
+    void i(String message) {
         log(Log.INFO, message);
     }
 
-    static void v(String message) {
+    void v(String message) {
         log(Log.VERBOSE, message);
     }
 
-    static void wtf(String message) {
+    void wtf(String message) {
         log(Log.ASSERT, message);
     }
 
-    private static void log(int logType, String message) {
-        LogLevel logLevel = Hawk.getLogLevel();
+    private void log(int logType, String message) {
         if (logLevel == LogLevel.NONE) {
             return;
         }
@@ -53,7 +57,7 @@ final class Logger {
         }
     }
 
-    private static void logChunk(int logType, String chunk) {
+    private void logChunk(int logType, String chunk) {
         switch (logType) {
             case Log.ERROR:
                 Log.e(TAG, chunk);

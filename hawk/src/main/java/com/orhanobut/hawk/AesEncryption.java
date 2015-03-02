@@ -21,28 +21,35 @@ final class AesEncryption implements Encryption {
     private AesCbcWithIntegrity.SecretKeys secretKeys;
     private String salt;
     private Storage storage;
+    private Logger logger;
 
     /**
      * Create an AesEncryption with a randomly generated salt value
+     * @param logger Logger instance
      * @param storage Storage
      * @param password Encryption password
      */
-    AesEncryption(Storage storage, String password) {
-        this(storage, password, null);
+    AesEncryption(Logger logger, Storage storage, String password) {
+        this(logger, storage, password, null);
     }
 
     /**
      * Create an AesEncryption with a custom salt value
+     * @param logger Logger instance
      * @param storage Storage
      * @param password Encryption password
      * @param salt Custom salt value (pass {@code null} to generate a random one)
      */
-    AesEncryption(Storage storage, String password, String salt) {
+    AesEncryption(Logger logger, Storage storage, String password, String salt) {
+        if (logger == null) {
+            throw new NullPointerException("Logger may not be null");
+        }
         if (TextUtils.isEmpty(salt)) {
             this.salt = storage.get(KEY_STORAGE_SALT);
         } else {
             this.salt = salt;
         }
+        this.logger = logger;
         this.storage = storage;
         generateSecretKey(password);
     }
@@ -57,7 +64,7 @@ final class AesEncryption implements Encryption {
             AesCbcWithIntegrity.CipherTextIvMac civ = AesCbcWithIntegrity.encrypt(value, secretKeys);
             result = civ.toString();
         } catch (GeneralSecurityException e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
 
         return result;
@@ -74,7 +81,7 @@ final class AesEncryption implements Encryption {
             AesCbcWithIntegrity.CipherTextIvMac civ = getCipherTextIvMac(value);
             result = AesCbcWithIntegrity.decrypt(civ, secretKeys);
         } catch (GeneralSecurityException e) {
-            Logger.d(e.getMessage());
+            logger.d(e.getMessage());
         }
 
         return result;

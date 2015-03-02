@@ -23,7 +23,7 @@ final class DataUtil {
      * @param storedText is the saved data
      * @return the DataInfo object which contains all necessary information
      */
-    static DataInfo getDataInfo(String storedText) {
+    static DataInfo getDataInfo(Logger logger, String storedText) {
         if (storedText == null) {
             throw new NullPointerException("Text should not be null");
         }
@@ -43,7 +43,7 @@ final class DataUtil {
             try {
                 clazz = Class.forName(className);
             } catch (ClassNotFoundException e) {
-                Logger.d(e.getMessage());
+                logger.d(e.getMessage());
             }
         }
 
