@@ -43,13 +43,36 @@ public final class Hawk {
      *
      * @param context  is used to instantiate context based objects. ApplicationContext will be used
      * @param password is used for key generation
+     * @param salt     is used for salting encryption
+     */
+    public static void init(Context context, String password, String salt) {
+        init(context, password, salt, LogLevel.NONE);
+    }
+
+    /**
+     * This method must be called in order to initiate the hawk
+     *
+     * @param context  is used to instantiate context based objects. ApplicationContext will be used
+     * @param password is used for key generation
      * @param logLevel is used for logging
      */
     public static void init(Context context, String password, LogLevel logLevel) {
+        init(context, password, null, logLevel);
+    }
+
+    /**
+     * This method must be called in order to initiate the hawk
+     *
+     * @param context  is used to instantiate context based objects. ApplicationContext will be used
+     * @param password is used for key generation
+     * @param logLevel is used for logging
+     * @param salt     is used for salting encryption
+     */
+    public static void init(Context context, String password, String salt, LogLevel logLevel) {
         Context appContext = context.getApplicationContext();
         Hawk.logLevel = logLevel;
         Hawk.storage = new SharedPreferencesStorage(appContext, TAG);
-        Hawk.encryption = new AesEncryption(new SharedPreferencesStorage(appContext, TAG_CRYPTO), password);
+        Hawk.encryption = new AesEncryption(new SharedPreferencesStorage(appContext, TAG_CRYPTO), password, salt);
         Hawk.encoder = new HawkEncoder(encryption, new GsonParser(new Gson()));
     }
 

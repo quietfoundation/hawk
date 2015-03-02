@@ -12,16 +12,38 @@ import java.security.GeneralSecurityException;
  */
 final class AesEncryption implements Encryption {
 
-    //never ever change this value since it will break backward compatibility in terms of keeping previous data
+    /**
+     * Key used to look up stored generated salt values, not the actual salt
+     * Never ever change this value since it will break backward compatibility in terms of keeping previous data
+     */
     private static final String KEY_STORAGE_SALT = "asdf3242klj";
 
-    private AesCbcWithIntegrity.SecretKeys key;
-    private String saltKey;
+    private AesCbcWithIntegrity.SecretKeys secretKeys;
+    private String salt;
     private Storage storage;
 
+    /**
+     * Create an AesEncryption with a randomly generated salt value
+     * @param storage Storage
+     * @param password Encryption password
+     */
     AesEncryption(Storage storage, String password) {
+        this(storage, password, null);
+    }
+
+    /**
+     * Create an AesEncryption with a custom salt value
+     * @param storage Storage
+     * @param password Encryption password
+     * @param salt Custom salt value (pass {@code null} to generate a random one)
+     */
+    AesEncryption(Storage storage, String password, String salt) {
+        if (TextUtils.isEmpty(salt)) {
+            this.salt = storage.get(KEY_STORAGE_SALT);
+        } else {
+            this.salt = salt;
+        }
         this.storage = storage;
-        this.saltKey = storage.get(KEY_STORAGE_SALT);
         generateSecretKey(password);
     }
 
@@ -32,7 +54,7 @@ final class AesEncryption implements Encryption {
         }
         String result = null;
         try {
-            AesCbcWithIntegrity.CipherTextIvMac civ = AesCbcWithIntegrity.encrypt(value, key);
+            AesCbcWithIntegrity.CipherTextIvMac civ = AesCbcWithIntegrity.encrypt(value, secretKeys);
             result = civ.toString();
         } catch (GeneralSecurityException e) {
             Logger.d(e.getMessage());
@@ -50,7 +72,7 @@ final class AesEncryption implements Encryption {
 
         try {
             AesCbcWithIntegrity.CipherTextIvMac civ = getCipherTextIvMac(value);
-            result = AesCbcWithIntegrity.decrypt(civ, key);
+            result = AesCbcWithIntegrity.decrypt(civ, secretKeys);
         } catch (GeneralSecurityException e) {
             Logger.d(e.getMessage());
         }
@@ -68,21 +90,28 @@ final class AesEncryption implements Encryption {
     }
 
     /**
-     * Gets the secret key by using salt and password. Salt is stored in the storage
-     * If the salt is not stored, that means it is first time and it creates the salt and
-     * save it in the storage
+     * Gets the secret keys by using salt and password.
+     * If not provided, a salt is generated and stored in the storage
      */
     private void generateSecretKey(String password) {
         try {
-            if (TextUtils.isEmpty(saltKey)) {
-                saltKey = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
-                storage.put(KEY_STORAGE_SALT, saltKey);
+            // No salt provided, generate and store a random one
+            if (TextUtils.isEmpty(salt)) {
+                salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+                storage.put(KEY_STORAGE_SALT, salt);
             }
 
-            key = AesCbcWithIntegrity.generateKeyFromPassword(password, saltKey);
+            secretKeys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public String getSalt() {
+        return salt;
+    }
+
+    public AesCbcWithIntegrity.SecretKeys getSecretKeys() {
+        return secretKeys;
+    }
 }
