@@ -1,6 +1,6 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Hawk-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1568)      [![API](https://img.shields.io/badge/API-8%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=8)   [![Join the chat at https://gitter.im/orhanobut/hawk](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/orhanobut/hawk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![](https://img.shields.io/badge/AndroidWeekly-%23141-blue.svg)](http://androidweekly.net/issues/issue-141) 
 
-#Hawk
+# Hawk
 Secure, simple key-value storage for android
 
 <img src='https://github.com/orhanobut/hawk/blob/master/images/hawk-logo.png' width='128' height='128'/>
@@ -15,7 +15,7 @@ Hawk provides:
 - Save any type
 - Save list of any type
 
-###Add dependency
+### Add dependency
 ```groovy
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
@@ -25,74 +25,74 @@ dependencies {
 }
 ```
 
-#### Initialize the hawk
+#### Create a hawk instance
 ```java
-Hawk.init(context, PASSWORD);
+Hawk hawk = new Hawk(context, PASSWORD, SALT);
 ```
 
 #### Save
 ```java
-Hawk.put(key, T);
+hawk.put(key, T);
 ```
 or
 ```java
-Hawk.put(key, List<T>);
+hawk.put(key, List<T>);
 ```
 
 #### Get
 ```java
-T result = Hawk.get(key);
+T result = hawk.get(key);
 ```
 or with default value
 
 ```java
-T result = Hawk.get(key, T);
+T result = hawk.get(key, T);
 ```
 
 #### Remove
 ```java
-Hawk.remove(key);
+hawk.remove(key);
 ```
 
 #### Contains
 ```java
-boolean contains = Hawk.contains(key);
+boolean contains = hawk.contains(key);
 ```
 
 #### Set the log output (optional)
 ```java
-Hawk.init(context,PASSWORD, LogLevel.FULL); // as default it is NONE
+hawk.init(context, PASSWORD, LogLevel.FULL); // as default it is NONE
 ```
 
 ##### More samples for save
 
 ```java
-Hawk.put("key", "something"); // Save string
-Hawk.put("key", true); // save boolean
-Hawk.put("key", new Foo()); // save an object
-Hawk.put("key", List<String>); // save list
-Hawk.put("key", List<Foo>); // save list of any type
-Hawk.put("key", 1234); // save numbers
+hawk.put("key", "something"); // Save string
+hawk.put("key", true); // save boolean
+hawk.put("key", new Foo()); // save an object
+hawk.put("key", List<String>); // save list
+hawk.put("key", List<Foo>); // save list of any type
+hawk.put("key", 1234); // save numbers
 ```
 
 ##### More samples for get
 
 ```java
-String value = Hawk.get(key);
-int value = Hawk.get(key);
-Foo value = Hawk.get(key);
-boolean value = Hawk.get(key);
-List<String> value = Hawk.get(key);
-List<Foo> value = Hawk.get(key);
+String value = hawk.get(key);
+int value = hawk.get(key);
+Foo value = hawk.get(key);
+boolean value = hawk.get(key);
+List<String> value = hawk.get(key);
+List<Foo> value = hawk.get(key);
 ```
 or with the defaults
 ```java
-String value = Hawk.get(key, "");
-int value = Hawk.get(key, 0);
-Foo value = Hawk.get(key, new Foo());
-boolean value = Hawk.get(key, false);
-List<String> value = Hawk.get(key, Collections.emptyList());
-List<Foo> value = Hawk.get(key, new ArrayList<Foo>);
+String value = hawk.get(key, "");
+int value = hawk.get(key, 0);
+Foo value = hawk.get(key, new Foo());
+boolean value = hawk.get(key, false);
+List<String> value = hawk.get(key, Collections.emptyList());
+List<Foo> value = hawk.get(key, new ArrayList<Foo>);
 ```
 
 ##### Benchmark result (ms)
@@ -112,7 +112,7 @@ Done with Nexus 4, Android L. Note that this is not certain values, I just made 
 ##### Credits
 I use the following implementation for the crypto and I believe it should get more attention. Thanks for this great hard work. https://github.com/tozny/java-aes-crypto and a great article about it : http://tozny.com/blog/encrypting-strings-in-android-lets-make-better-mistakes/
 
-###License
+### License
 <pre>
 Copyright 2015 Orhan Obut
 
