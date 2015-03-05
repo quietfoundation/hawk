@@ -1,35 +1,40 @@
-apply plugin: 'maven'
 apply plugin: 'signing'
-def sonatypeRepositoryUrl
-if (isReleaseBuild()) {
-    println 'RELEASE BUILD'
-    sonatypeRepositoryUrl = hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-} else {
-    println 'DEBUG BUILD'
-    sonatypeRepositoryUrl = hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
-}
+apply plugin: 'maven'
 
 def USERNAME = "";
 def PASSWORD = "";
 
 afterEvaluate { project ->
     uploadArchives {
+        def repositoryUrl
         def Properties versionProps = new Properties()
         try {
             versionProps.load(new FileInputStream('credential.properties'))
-            USERNAME = versionProps['USERNAME'];
-            PASSWORD = versionProps['PASSWORD'];
+            USERNAME = versionProps['USERNAME']
+            PASSWORD = versionProps['PASSWORD']
+            repositoryUrl = versionProps['URL']
         } catch(FileNotFoundException e) {
             println 'Failed to find file credential.properties. Maven deploy disabled'
+        }
+
+        // Allow custom specification of maven repository URL
+        if (repositoryUrl != null && repositoryUrl.length() > 0) {
+            println 'CUSTOM BUILD'
+        } else if (isReleaseBuild()) {
+            println 'RELEASE BUILD'
+            repositoryUrl = hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
+                    : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+        } else {
+            println 'DEBUG BUILD'
+            repositoryUrl = hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
+                    : "https://oss.sonatype.org/content/repositories/snapshots/"
         }
 
         repositories {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
                 pom.artifactId = POM_ARTIFACT_ID
-                repository(url: sonatypeRepositoryUrl) {
+                repository(url: repositoryUrl) {
                     authentication(userName: USERNAME, password: PASSWORD)
                 }
                 pom.project {
