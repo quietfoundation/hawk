@@ -10,6 +10,7 @@ import android.test.InstrumentationTestCase;
 public class AesEncryptionTest extends InstrumentationTestCase {
     private static final String PASSWORD = "hawkFTW";
     Storage fooStorage;
+    Logger logger = new Logger(LogLevel.FULL);
 
     @Override
     protected void setUp() throws Exception {
@@ -29,13 +30,13 @@ public class AesEncryptionTest extends InstrumentationTestCase {
     }
 
     public void testSaltGenerationAndStorage() {
-        AesEncryption encryption = new AesEncryption(fooStorage, PASSWORD);
+        AesEncryption encryption = new AesEncryption(logger, fooStorage, PASSWORD);
         // Verify salt was created and stored
         assertEquals(fooStorage.count(), 1);
     }
 
     public void testSaltNoGenerationWhenProvided() {
-        AesEncryption encryption = new AesEncryption(fooStorage, PASSWORD, "NaCl");
+        AesEncryption encryption = new AesEncryption(logger, fooStorage, PASSWORD, "NaCl");
         // Verify salt was not created and stored
         assertEquals(fooStorage.count(), 0);
     }
