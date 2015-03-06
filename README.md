@@ -27,7 +27,9 @@ dependencies {
 
 #### Create a hawk instance
 ```java
-Hawk hawk = new Hawk(context, PASSWORD, SALT);
+Hawk hawk = new Hawk.Builder(context, PASSWORD)
+    // .salt(SALT)    // additional parameters can be specified as invocations here
+    .build();
 ```
 
 #### Save

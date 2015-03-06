@@ -21,7 +21,7 @@ public class HawkTest extends InstrumentationTestCase {
                 "dexmaker.dexcache",
                 getInstrumentation().getTargetContext().getCacheDir().getPath());
         context = getInstrumentation().getContext();
-        hawk = new Hawk(context, "testPassword");
+        hawk = new Hawk.Builder(context, "testPassword").build();
         hawk.clear();
         hawk.resetCrypto();
     }

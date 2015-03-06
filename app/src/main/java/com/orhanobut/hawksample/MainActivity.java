@@ -28,7 +28,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        hawk = new Hawk(this, "asdfasdfds", LogLevel.FULL);
+        hawk = new Hawk.Builder(this, "asdfasdfds")
+                .logLevel(LogLevel.FULL)
+                .build();
 
         prefs = getSharedPreferences("BENCHARMK", MODE_PRIVATE);
         editor = prefs.edit();

@@ -15,6 +15,7 @@ public class HawkEncoderTest extends InstrumentationTestCase {
 
     Context context;
     Encoder encoder;
+    Logger logger = new Logger(LogLevel.FULL);
 
     @Override
     protected void setUp() throws Exception {
@@ -25,7 +26,8 @@ public class HawkEncoderTest extends InstrumentationTestCase {
         context = getInstrumentation().getContext();
 
         encoder = new HawkEncoder(
-                new AesEncryption(new SharedPreferencesStorage(context, "test"), "password"),
+                logger,
+                new AesEncryption(logger, new SharedPreferencesStorage(context, "test"), "password"),
                 new GsonParser(new Gson())
         );
     }
@@ -54,7 +56,7 @@ public class HawkEncoderTest extends InstrumentationTestCase {
 
     public void testConstructorShouldThrowNPE() {
         try {
-            new HawkEncoder(null, null);
+            new HawkEncoder(logger, null, null);
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);

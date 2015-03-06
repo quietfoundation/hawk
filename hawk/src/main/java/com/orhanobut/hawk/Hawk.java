@@ -28,22 +28,83 @@ public final class Hawk {
     private Logger logger;
 
     /**
-     * Gets a new instance of Hawk
+     * Used for building an instance of Hawk
+     * Builder pattern borrowed from Effective Java, Chapter 2
+     * https://stackoverflow.com/questions/2169190/example-of-builder-pattern-in-java-api
      */
-    public Hawk(Context context, String password) {
-        this(context, password, LogLevel.NONE);
+    public static class Builder {
+        // Required parameters
+        private final Context context;
+        private final String password;
+
+        // Optional parameters - initialized to default values
+        private String salt;
+        private Encoder encoder;
+        private Storage storage;
+        private Encryption encryption;
+        private LogLevel logLevel = LogLevel.NONE;
+        private Logger logger;
+
+        public Builder(Context context, String password) {
+            if (context == null) {
+                throw new IllegalArgumentException("context must not be null");
+            }
+            if (password == null) {
+                throw new IllegalArgumentException("password must not be null");
+            }
+            this.context = context;
+            this.password = password;
+        }
+
+        public Builder salt(String salt) {
+            this.salt = salt;
+            return this;
+        }
+
+        public Builder encoder(Encoder encoder) {
+            this.encoder = encoder;
+            return this;
+        }
+
+        public Builder storage(Storage storage) {
+            this.storage = storage;
+            return this;
+        }
+
+        public Builder encryption(Encryption encryption) {
+            this.encryption = encryption;
+            return this;
+        }
+
+        public Builder logLevel(LogLevel logLevel) {
+            this.logLevel = logLevel;
+            return this;
+        }
+
+        public Builder logger(Logger logger) {
+            this.logger = logger;
+            return this;
+        }
+
+        public Hawk build() {
+            return new Hawk(this);
+        }
     }
 
-    /**
-     * Get a new instance of Hawk.
-     */
-    public Hawk(Context context, String password, LogLevel logLevel) {
-        Context appContext = context.getApplicationContext();
-        this.logger = new Logger(logLevel);
-        this.storage = new SharedPreferencesStorage(appContext, TAG);
-        this.encryption = new AesEncryption(logger, new SharedPreferencesStorage(appContext, TAG_CRYPTO), password);
-        this.encoder = new HawkEncoder(logger, encryption, new GsonParser(new Gson()));
-        this.logLevel = logLevel;
+    private Hawk(Builder builder) {
+        Context appContext = builder.context.getApplicationContext();
+        logger = (builder.logger != null) ? builder.logger : new Logger(logLevel);
+        encoder = (builder.encoder != null) ? builder.encoder :
+                new HawkEncoder(logger, encryption, new GsonParser(new Gson()));
+        storage = (builder.storage != null) ? builder.storage : new SharedPreferencesStorage(appContext, TAG);
+        encryption = (builder.encryption != null) ? builder.encryption :
+                new AesEncryption(
+                        logger,
+                        new SharedPreferencesStorage(appContext, TAG_CRYPTO),
+                        builder.password,
+                        builder.salt
+                );
+        logLevel = builder.logLevel;
     }
 
     /**
