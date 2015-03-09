@@ -94,9 +94,6 @@ public final class Hawk {
     private Hawk(Builder builder) {
         Context appContext = builder.context.getApplicationContext();
         logger = (builder.logger != null) ? builder.logger : new Logger(logLevel);
-        encoder = (builder.encoder != null) ? builder.encoder :
-                new HawkEncoder(logger, encryption, new GsonParser(new Gson()));
-        storage = (builder.storage != null) ? builder.storage : new SharedPreferencesStorage(appContext, TAG);
         encryption = (builder.encryption != null) ? builder.encryption :
                 new AesEncryption(
                         logger,
@@ -104,6 +101,9 @@ public final class Hawk {
                         builder.password,
                         builder.salt
                 );
+        encoder = (builder.encoder != null) ? builder.encoder :
+                new HawkEncoder(logger, encryption, new GsonParser(new Gson()));
+        storage = (builder.storage != null) ? builder.storage : new SharedPreferencesStorage(appContext, TAG);
         logLevel = builder.logLevel;
     }
 
