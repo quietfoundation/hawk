@@ -108,7 +108,7 @@ final class AesEncryption implements Encryption {
                 storage.put(KEY_STORAGE_SALT, salt);
             }
 
-            secretKeys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
+            secretKeys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt.getBytes());
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
