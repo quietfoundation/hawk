@@ -1,16 +1,19 @@
 package com.orhanobut.hawk;
 
-import android.content.Context;
-import android.test.AndroidTestCase;
 import android.test.InstrumentationTestCase;
 
 /**
  * Created by bosgood on 2/27/15.
  */
 public class AesEncryptionTest extends InstrumentationTestCase {
+
     private static final String PASSWORD = "hawkFTW";
-    Storage fooStorage;
-    Logger logger = new Logger(LogLevel.FULL);
+
+    private static final String SALT = "NaCl";
+
+    private Storage fooStorage;
+
+    private static final Logger LOGGER = new Logger(LogLevel.FULL);
 
     @Override
     protected void setUp() throws Exception {
@@ -30,14 +33,23 @@ public class AesEncryptionTest extends InstrumentationTestCase {
     }
 
     public void testSaltGenerationAndStorage() {
-        AesEncryption encryption = new AesEncryption(logger, fooStorage, PASSWORD);
+        final AesEncryption encryption = new AesEncryption(LOGGER, fooStorage, PASSWORD);
         // Verify salt was created and stored
         assertEquals(fooStorage.count(), 1);
     }
 
     public void testSaltNoGenerationWhenProvided() {
-        AesEncryption encryption = new AesEncryption(logger, fooStorage, PASSWORD, "NaCl");
+        final AesEncryption encryption = new AesEncryption(LOGGER, fooStorage, PASSWORD, SALT);
         // Verify salt was not created and stored
         assertEquals(fooStorage.count(), 0);
+    }
+
+    public void testEncryptDecryptWithSpecifiedKey() {
+        final String encryptionKey = "1234";
+        final String value = "test";
+        final AesEncryption encryption = new AesEncryption(LOGGER, fooStorage, PASSWORD, SALT);
+        final String encryptedString = encryption.encrypt(encryptionKey, value.getBytes());
+        assertNotNull(encryptedString);
+        assertEquals(value, new String((encryption.decrypt(encryptionKey, encryptedString))));
     }
 }

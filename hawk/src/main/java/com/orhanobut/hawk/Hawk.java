@@ -1,9 +1,7 @@
 package com.orhanobut.hawk;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
-
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -110,6 +108,32 @@ public final class Hawk {
     /**
      * Saves every type of Objects. List, List<T>, primitives
      *
+     * @param encryptionKey Separate key to encrypt value
+     * @param key   is used to save the data
+     * @param value is the data that is gonna be saved. Value can be object, list type, primitives
+     * @return true if put is successful
+     */
+    public <T> boolean putWithEncryptionKey(String encryptionKey, String key, T value) {
+        if (encryptionKey == null) {
+            throw new NullPointerException("encryptionKey cannot be null");
+        }
+
+        if (key == null) {
+            throw new NullPointerException("Key cannot be null");
+        }
+
+        String encodedText = encode(encryptionKey, value);
+        //if any exception occurs during encoding, encodedText will be null and thus operation is unsuccessful
+        if (encodedText == null) {
+            return false;
+        }
+
+        return storage.put(key, encodedText);
+    }
+
+    /**
+     * Saves every type of Objects. List, List<T>, primitives
+     *
      * @param key   is used to save the data
      * @param value is the data that is gonna be saved. Value can be object, list type, primitives
      * @return true if put is successful
@@ -150,6 +174,24 @@ public final class Hawk {
     /**
      * Encodes the given value as full text (cipher + data info)
      *
+     * @param encryptionKey is the key used to encrypt value
+     * @param value is the given value to encode
+     * @return full text as string
+     */
+    private <T> String encode(String encryptionKey, T value) {
+        if (value == null) {
+            throw new NullPointerException("Value cannot be null");
+        }
+        String cipherText = encoder.encode(encryptionKey, value);
+        if (cipherText == null) {
+            return null;
+        }
+        return DataUtil.addTypeAsObject(cipherText, value.getClass());
+    }
+
+    /**
+     * Encodes the given value as full text (cipher + data info)
+     *
      * @param value is the given value to encode
      * @return full text as string
      */
@@ -183,6 +225,23 @@ public final class Hawk {
         }
         Class clazz = list.get(0).getClass();
         return DataUtil.addTypeAsList(cipherText, clazz);
+    }
+
+    /**
+     * @param key is used to get the saved data
+     * @return the saved object
+     */
+    public <T> T getWithEncryptionKey(String encryptionKey, String key) {
+        if (key == null) {
+            throw new NullPointerException("Key cannot be null");
+        }
+        String fullText = storage.get(key);
+        try {
+            return encoder.decode(encryptionKey, fullText);
+        } catch (Exception e) {
+            logger.d(e.getMessage());
+        }
+        return null;
     }
 
     /**

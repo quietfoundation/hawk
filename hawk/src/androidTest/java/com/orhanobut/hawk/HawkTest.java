@@ -11,7 +11,10 @@ import java.util.List;
  */
 public class HawkTest extends InstrumentationTestCase {
 
+    private static final String ENCRYPTION_KEY = "1234";
+
     Context context;
+
     Hawk hawk;
 
     @Override
@@ -423,4 +426,9 @@ public class HawkTest extends InstrumentationTestCase {
         }
     }
 
+    public void testStringWithDifferentEncryptionKey() {
+        final String expected = "test";
+        hawk.putWithEncryptionKey(ENCRYPTION_KEY, "tag", expected);
+        assertEquals(expected, hawk.getWithEncryptionKey(ENCRYPTION_KEY, "tag"));
+    }
 }

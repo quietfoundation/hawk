@@ -8,6 +8,15 @@ import java.util.List;
 interface Encoder {
 
     /**
+     * Encodes the value and encrypts it with key
+     *
+     * @param key used to encrypt value
+     * @param value will be encoded
+     * @return the encoded string
+     */
+    <T> String encode(String key, T value);
+
+    /**
      * Encodes the value and encrypts it
      *
      * @param value will be encoded
@@ -22,6 +31,15 @@ interface Encoder {
      * @return the encoded string
      */
     <T> String encode(List<T> value);
+
+    /**
+     * Decodes and decrypts the cipher text
+     *
+     * @param value is the encoded data
+     * @return the plain value
+     * @throws Exception
+     */
+    <T> T decode(String key, String value) throws Exception;
 
     /**
      * Decodes and decrypts the cipher text

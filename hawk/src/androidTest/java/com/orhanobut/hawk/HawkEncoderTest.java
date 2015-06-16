@@ -13,8 +13,12 @@ import java.util.List;
  */
 public class HawkEncoderTest extends InstrumentationTestCase {
 
+    private static final String ENCRYPTION_KEY = "1234";
+
     Context context;
+
     Encoder encoder;
+
     Logger logger = new Logger(LogLevel.FULL);
 
     @Override
@@ -93,4 +97,18 @@ public class HawkEncoderTest extends InstrumentationTestCase {
         assertNotNull(encoder.encode(list));
     }
 
+    public void testEncodeWithKeyReturnsNullForNullValue() {
+        assertNull(encoder.encode(ENCRYPTION_KEY, null));
+    }
+
+    public void testEncodeWithKeyReturnsNullForNullKey() {
+        assertNull(encoder.encode(null, "test"));
+    }
+
+    public void testEncodeDecodeWithKey() throws Exception {
+        final String value = "test";
+        final String encodedValue = encoder.encode(ENCRYPTION_KEY, value);
+        assertNotNull(encodedValue);
+        assertEquals(value, encoder.decode(ENCRYPTION_KEY, DataUtil.addTypeAsObject(encodedValue, value.getClass())));
+    }
 }

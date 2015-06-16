@@ -55,6 +55,22 @@ final class AesEncryption implements Encryption {
     }
 
     @Override
+    public String encrypt(String key, byte[] value) {
+        if (value == null) {
+            return null;
+        }
+        String result = null;
+        try {
+            AesCbcWithIntegrity.CipherTextIvMac civ = AesCbcWithIntegrity.encrypt(value, generateSecretKeys(key));
+            result = civ.toString();
+        } catch (GeneralSecurityException e) {
+            logger.d(e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
     public String encrypt(byte[] value) {
         if (value == null) {
             return null;
@@ -63,6 +79,23 @@ final class AesEncryption implements Encryption {
         try {
             AesCbcWithIntegrity.CipherTextIvMac civ = AesCbcWithIntegrity.encrypt(value, secretKeys);
             result = civ.toString();
+        } catch (GeneralSecurityException e) {
+            logger.d(e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    public byte[] decrypt(String key, String value) {
+        if (value == null) {
+            return null;
+        }
+        byte[] result = null;
+
+        try {
+            AesCbcWithIntegrity.CipherTextIvMac civ = getCipherTextIvMac(value);
+            result = AesCbcWithIntegrity.decrypt(civ, generateSecretKeys(key));
         } catch (GeneralSecurityException e) {
             logger.d(e.getMessage());
         }
@@ -109,6 +142,24 @@ final class AesEncryption implements Encryption {
             }
 
             secretKeys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt.getBytes());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Gets the secret keys by using salt and password.
+     * If not provided, a salt is generated and stored in the storage
+     */
+    private AesCbcWithIntegrity.SecretKeys generateSecretKeys(String password) {
+        try {
+            // No salt provided, generate and store a random one
+            if (TextUtils.isEmpty(salt)) {
+                salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+                storage.put(KEY_STORAGE_SALT, salt);
+            }
+
+            return AesCbcWithIntegrity.generateKeyFromPassword(password, salt.getBytes());
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }

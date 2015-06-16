@@ -41,11 +41,36 @@ final class HawkEncoder implements Encoder {
     }
 
     @Override
+    public <T> String encode(String key, T value) {
+        if (key == null || value == null) {
+            return null;
+        }
+
+        byte[] bytes = getBytes(value);
+
+        if (bytes == null) {
+            return null;
+        }
+
+        return encryption.encrypt(key, bytes);
+    }
+
+    @Override
     public <T> String encode(T value) {
         if (value == null) {
             return null;
         }
 
+        byte[] bytes = getBytes(value);
+
+        if (bytes == null) {
+            return null;
+        }
+
+        return encryption.encrypt(bytes);
+    }
+
+    private <T> byte[] getBytes(T value) {
         byte[] bytes;
         if (value instanceof Serializable) {
             bytes = fromSerializable((Serializable) value);
@@ -53,12 +78,7 @@ final class HawkEncoder implements Encoder {
             String json = parser.toJson(value);
             bytes = json.getBytes();
         }
-
-        if (bytes == null) {
-            return null;
-        }
-
-        return encryption.encrypt(bytes);
+        return bytes;
     }
 
     @Override
@@ -70,6 +90,37 @@ final class HawkEncoder implements Encoder {
         byte[] bytes = json.getBytes();
 
         return encryption.encrypt(bytes);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T decode(String key, String value) throws Exception {
+        if (key ==null || value == null) {
+            return null;
+        }
+        DataInfo info = DataUtil.getDataInfo(logger, value);
+        boolean isList = info.isList();
+
+        byte[] bytes = encryption.decrypt(key, info.getCipherText());
+        //if any exception occurs during decrypt, bytes will be null
+        if (bytes == null) {
+            return null;
+        }
+
+        // if the value is not list and serializable, then use the normal deserialize
+        if (!isList && info.isSerializable()) {
+            return toSerializable(bytes);
+        }
+
+        // convert to the string json
+        String json = new String(bytes);
+
+        Class<?> type = info.getClazz();
+        if (!isList) {
+            return parser.fromJson(json, type);
+        }
+
+        return fromJsonList(json, type);
     }
 
     @SuppressWarnings("unchecked")
